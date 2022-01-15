@@ -22,10 +22,12 @@ void setup () {
 }
 void loop () {
  DateTime now = rtc.now();
- DateTime currentYearFirstDay = DateTime(2022, 1, 1, 0, 0, 0);
+ DateTime currentYearFirstDay = DateTime(now.year(), 1, 1, 0, 0, 0);
  int dayOfYear = divideAndRoundUp(now.unixtime() - currentYearFirstDay.unixtime(), 86400L);
  Serial.print("Sunrise is today at: ");
  Serial.println(getSunriseByDayOfYear(dayOfYear), DEC);
+ Serial.print("Mapping value first hour: ");
+ Serial.print(map(1,0,24,0,150), DEC);
  Serial.println();
  Serial.println();
  delay(3000);
@@ -34,52 +36,150 @@ void loop () {
 int divideAndRoundUp(float x, float y)
 {
    int a = (x -1)/y +1;
-
    return a;
 }
 
 float getSunriseByDayOfYear(int dayOfYear) {
-  if(dayOfYear > 10) {
-    return 8.00;
+  if(dayOfYear < 15) {
+    return 6.7f;
   }
-  return 10.00;
+  if(dayOfYear < 26) {
+    return 6.583f;
+  }
+  if(dayOfYear < 34) {
+    return 6.333f;
+  }
+  if(dayOfYear < 41) {
+    return 6.167f;
+  }
+  if(dayOfYear < 47) {
+    return 6.00f;
+  }
+  if(dayOfYear < 53) {
+    return 5.833f;
+  }
+  if(dayOfYear < 58) {
+    return 5.666f;
+  }
+  if(dayOfYear < 63) {
+    return 5.500f;
+  }
+  if(dayOfYear < 68) {
+    return 5.333f;
+  }
+  if(dayOfYear < 73) {
+    return 5.167f;
+  }
+  if(dayOfYear < 78) {
+    return 5.000f;
+  }
+  if(dayOfYear < 82) {
+    return 4.833f;
+  }
+  if(dayOfYear < 88) {
+    return 4.666f;
+  }
+  if(dayOfYear < 93) {
+    return 4.500f;
+  }
+  if(dayOfYear < 97) {
+    return 4.333f;
+  }
+  if(dayOfYear < 103) {
+    return 4.167f;
+  }
+  if(dayOfYear < 108) {
+    return 4.000f;
+  }
+  if(dayOfYear < 113) {
+    return 3.833f;
+  }
+  if(dayOfYear < 119) {
+    return 3.666f;
+  }
+  if(dayOfYear < 125) {
+    return 3.500f;
+  }
+  if(dayOfYear < 131) {
+    return 3.333f;
+  }
+  if(dayOfYear < 139) {
+    return 3.167f;
+  }
+  if(dayOfYear < 149) {
+    return 3.000f;
+  }
+  if(dayOfYear < 171) {
+    return 2.883f;
+  }
+  if(dayOfYear < 185) {
+    return 3.000f;
+  }
+  if(dayOfYear < 197) {
+    return 3.167f;
+  }
+  if(dayOfYear < 206) {
+    return 3.333f;
+  }
+  if(dayOfYear < 214) {
+    return 3.500f;
+  }
+  if(dayOfYear < 222) {
+    return 3.666f;
+  }
+  if(dayOfYear < 229) {
+    return 3.833f;
+  }
+  if(dayOfYear < 236) {
+    return 4.000f;
+  }
+  if(dayOfYear < 244) {
+    return 4.167f;
+  }
+  if(dayOfYear < 250) {
+    return 4.333f;
+  }
+  if(dayOfYear < 258) {
+    return 4.500f;
+  }
+  if(dayOfYear < 265) {
+    return 4.666f;
+  }
+  if(dayOfYear < 272) {
+    return 4.833;
+  }
+  if(dayOfYear < 279) {
+    return 5.000f;
+  }
+  if(dayOfYear < 186) {
+    return 5.167f;
+  }
+  if(dayOfYear < 293) {
+    return 5.333f;
+  }
+  if(dayOfYear < 299) {
+    return 5.500f;
+  }
+  if(dayOfYear < 306) {
+    return 5.666f;
+  }
+  if(dayOfYear < 312) {
+    return 5.833f;
+  }
+  if(dayOfYear < 319) {
+    return 6.000f;
+  }      
+  if(dayOfYear < 325) {
+    return 6.167f;
+  }  
+  if(dayOfYear < 333) {
+    return 6.333f;
+  }  
+  if(dayOfYear < 341) {
+    return 6.500f;
+  }  
+  if(dayOfYear < 352) {
+    return 6.666f;
+  }
+  return 6.750f; 
 }
-
-
-
-
-
-
-
-
-
-
-
-
- /*Serial.print(now.year(), DEC);
- Serial.print('/');
- Serial.print(now.month(), DEC);
- Serial.print('/');
- Serial.print(now.day(), DEC);
- Serial.print(" (");
- Serial.print(daysOfTheWeek[now.dayOfTheWeek()]);
- Serial.print(") ");
- Serial.print(now.hour(), DEC);
- Serial.print(':');
- Serial.print(now.minute(), DEC);
- Serial.print(':');
- Serial.print(now.second(), DEC);
- Serial.println();
- Serial.print("Date of first this year: ");
- Serial.print(currentYearFirstDay.year(), DEC);
- Serial.print("Date of  first this year is valid:");
- if(currentYearFirstDay.isValid()) {
- Serial.print("YES");
- } else {
-   Serial.print("NO");
- }
- Serial.print(" days this year: ");
- Serial.print(divideAndRoundUp(now.unixtime() - currentYearFirstDay.unixtime(), 86400L));
- Serial.println("d");
- // days since first day of year
- Serial.println(""); */
