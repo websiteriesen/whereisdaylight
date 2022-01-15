@@ -3,7 +3,10 @@
 #include "RTClib.h"
 
 RTC_DS1307 rtc;
-char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
+int LED_NUMBER_VIENNA = 75;
+int MAX_NUMBER_LED = 150;
+
 void setup () {
  while (!Serial); // for Leonardo/Micro/Zero
  Serial.begin(57600);
@@ -24,10 +27,45 @@ void loop () {
  DateTime now = rtc.now();
  DateTime currentYearFirstDay = DateTime(now.year(), 1, 1, 0, 0, 0);
  int dayOfYear = divideAndRoundUp(now.unixtime() - currentYearFirstDay.unixtime(), 86400L);
+ float sunset = getSunsetByDayOfYear(dayOfYear);
+ float sunrise = getSunriseByDayOfYear(dayOfYear);
+ bool hasRolledOver = false;
+ int numberOfLightUpPixels = decimalmap(sunset - sunrise,0,24,0,MAX_NUMBER_LED);
+ float currentHour = now.hour();
+ float currentTimeInDecimalFormat = currentHour + (now.minute() / (float)60);
+ int startPixelLitUp = LED_NUMBER_VIENNA + decimalmap(currentTimeInDecimalFormat - sunrise, 0, 24, 0, MAX_NUMBER_LED);
+ int endPixelLitUp = startPixelLitUp - numberOfLightUpPixels;
+ if(endPixelLitUp < 0) {
+   endPixelLitUp = MAX_NUMBER_LED + endPixelLitUp;
+   hasRolledOver = true;
+ }
+ if(startPixelLitUp > MAX_NUMBER_LED) {
+   startPixelLitUp = startPixelLitUp - MAX_NUMBER_LED;
+   hasRolledOver = true;
+ }
  Serial.print("Sunrise is today at: ");
  Serial.println(getSunriseByDayOfYear(dayOfYear), DEC);
- Serial.print("Mapping value first hour: ");
- Serial.print(decimalmap(4.333f,0,24,0,150), DEC);
+ Serial.print("Light up pixels are: ");
+ Serial.println(numberOfLightUpPixels, DEC);
+ Serial.print("Time in decimal format: ");
+ Serial.println(currentTimeInDecimalFormat, DEC);
+ Serial.print("Start pixel is: ");
+ Serial.println(startPixelLitUp, DEC);
+ Serial.print("End pixel is: ");
+ Serial.println(endPixelLitUp, DEC);
+ Serial.println("Pixel start is left pixel, pixel end is right pixel!");
+ Serial.print("Range that is lit up is: ");
+ if(hasRolledOver) {
+   Serial.print("0-");
+   Serial.print(startPixelLitUp);
+   Serial.print(" and ");
+   Serial.print(endPixelLitUp);
+   Serial.println("-150");
+ } else {
+   Serial.print(startPixelLitUp);
+   Serial.print("-");
+   Serial.println(endPixelLitUp);
+ }
  Serial.println();
  Serial.println();
  delay(3000);
