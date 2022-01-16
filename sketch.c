@@ -2,6 +2,34 @@
 #include <Wire.h>
 #include "RTClib.h"
 
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+ #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
+#endif
+
+// Digital IO pin connected to the button. This will be driven with a
+// pull-up resistor so the switch pulls the pin to ground momentarily.
+// On a high -> low transition the button press logic will execute.
+#define BUTTON_PIN   2
+
+#define PIXEL_PIN    6  // Digital IO pin connected to the NeoPixels.
+
+#define PIXEL_COUNT 150  // Number of NeoPixels
+
+// Declare our NeoPixel strip object:
+Adafruit_NeoPixel strip(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
+// Argument 1 = Number of pixels in NeoPixel strip
+// Argument 2 = Arduino pin number (most are valid)
+// Argument 3 = Pixel type flags, add together as needed:
+//   NEO_KHZ800  800 KHz bitstream (most NeoPixel products w/WS2812 LEDs)
+//   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
+//   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
+//   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
+//   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
+
+boolean oldState = HIGH;
+int     mode     = 0;    // Currently-active animation mode, 0-9
+
 RTC_DS1307 rtc;
 
 int LED_NUMBER_VIENNA = 75;
@@ -22,8 +50,12 @@ void setup () {
    // January 21, 2014 at 3am you would call:
    // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
  }
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  strip.begin(); // Initialize NeoPixel strip object (REQUIRED)
+  strip.show();  // Initialize all pixels to 'off'
 }
 void loop () {
+  strip.clear();
  DateTime now = rtc.now();
  DateTime currentYearFirstDay = DateTime(now.year(), 1, 1, 0, 0, 0);
  int dayOfYear = divideAndRoundUp(now.unixtime() - currentYearFirstDay.unixtime(), 86400L);
@@ -33,7 +65,7 @@ void loop () {
  int numberOfLightUpPixels = decimalmap(sunset - sunrise,0,24,0,MAX_NUMBER_LED);
  float currentHour = now.hour();
  float currentTimeInDecimalFormat = currentHour + (now.minute() / (float)60);
- int startPixelLitUp = LED_NUMBER_VIENNA + decimalmap(currentTimeInDecimalFormat - sunrise, 0, 24, 0, MAX_NUMBER_LED);
+ int startPixelLitUp = LED_NUMBER_VIENNA + decimalmap(0 - sunrise, 0, 24, 0, MAX_NUMBER_LED);
  int endPixelLitUp = startPixelLitUp - numberOfLightUpPixels;
  if(endPixelLitUp < 0) {
    endPixelLitUp = MAX_NUMBER_LED + endPixelLitUp;
@@ -43,6 +75,7 @@ void loop () {
    startPixelLitUp = startPixelLitUp - MAX_NUMBER_LED;
    hasRolledOver = true;
  }
+ strip.setPixelColor(1, 255,255,255); // Set pixel 'c' to value 'color'
  Serial.print("Sunrise is today at: ");
  Serial.println(getSunriseByDayOfYear(dayOfYear), DEC);
  Serial.print("Light up pixels are: ");
@@ -55,17 +88,33 @@ void loop () {
  Serial.println(endPixelLitUp, DEC);
  Serial.println("Pixel start is left pixel, pixel end is right pixel!");
  Serial.print("Range that is lit up is: ");
+    strip.clear();         //   Set all pixels in RAM to 0 (off)
  if(hasRolledOver) {
    Serial.print("0-");
    Serial.print(startPixelLitUp);
    Serial.print(" and ");
    Serial.print(endPixelLitUp);
    Serial.println("-150");
+
  } else {
    Serial.print(startPixelLitUp);
    Serial.print("-");
    Serial.println(endPixelLitUp);
+
  }
+  for(int a=0; a<MAX_NUMBER_LED; a++) { 
+    if(hasRolledOver) {
+      if(a < startPixelLitUp || a > endPixelLitUp) {
+        strip.setPixelColor(a, 255,255,255); // Set pixel 'c' to value 'color'
+      }
+    } else {
+      if(a > endPixelLitUp && a < startPixelLitUp) {
+        strip.setPixelColor(a, 255,255,255); // Set pixel 'c' to value 'color'
+      }
+    }
+
+  }
+   strip.show(); // Update strip with new contents
  Serial.println();
  Serial.println();
  delay(3000);
