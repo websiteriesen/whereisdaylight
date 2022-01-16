@@ -7,11 +7,6 @@
  #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
 #endif
 
-// Digital IO pin connected to the button. This will be driven with a
-// pull-up resistor so the switch pulls the pin to ground momentarily.
-// On a high -> low transition the button press logic will execute.
-#define BUTTON_PIN   2
-
 #define PIXEL_PIN    6  // Digital IO pin connected to the NeoPixels.
 
 #define PIXEL_COUNT 150  // Number of NeoPixels
@@ -50,7 +45,6 @@ void setup () {
    // January 21, 2014 at 3am you would call:
    // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
  }
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
   strip.begin(); // Initialize NeoPixel strip object (REQUIRED)
   strip.show();  // Initialize all pixels to 'off'
 }
