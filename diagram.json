@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "author": "Anonymous maker",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 142, "left": 6, "attrs": {} },
+    { "type": "wokwi-ds1307", "id": "rtc1", "top": 10.15, "left": 330.52, "attrs": {} },
+    {
+      "type": "wokwi-neopixel-canvas",
+      "id": "neopixels",
+      "top": -267.75,
+      "left": -507.12,
+      "attrs": { "rows": "1", "cols": "150", "matrixBrightness": "10" },
+      "rotate": 180
+    }
+  ],
+  "connections": [
+    [ "rtc1:SCL", "uno:A5", "green", [ "h0" ] ],
+    [ "rtc1:SDA", "uno:A4", "green", [ "h0" ] ],
+    [ "rtc1:5V", "uno:3.3V", "red", [ "h0" ] ],
+    [ "rtc1:GND", "uno:GND.2", "black", [ "h0" ] ],
+    [ "neopixels:DIN", "uno:6", "green", [ "v0" ] ],
+    [ "neopixels:VSS", "uno:GND.1", "green", [ "v0" ] ],
+    [ "neopixels:VDD", "uno:5V", "green", [ "v0" ] ]
+  ]
+}
