@@ -10,7 +10,7 @@
       "id": "neopixels",
       "top": -267.75,
       "left": -507.12,
-      "attrs": { "rows": "1", "cols": "150", "matrixBrightness": "10" },
+      "attrs": { "rows": "1", "cols": "120", "matrixBrightness": "10" },
       "rotate": 180
     }
   ],
