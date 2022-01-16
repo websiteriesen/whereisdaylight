@@ -65,7 +65,7 @@ void loop () {
  int numberOfLightUpPixels = decimalmap(sunset - sunrise,0,24,0,MAX_NUMBER_LED);
  float currentHour = now.hour();
  float currentTimeInDecimalFormat = currentHour + (now.minute() / (float)60);
- int startPixelLitUp = LED_NUMBER_VIENNA + decimalmap(0 - sunrise, 0, 24, 0, MAX_NUMBER_LED);
+ int startPixelLitUp = LED_NUMBER_VIENNA + decimalmap(currentTimeInDecimalFormat - sunrise, 0, 24, 0, MAX_NUMBER_LED);
  int endPixelLitUp = startPixelLitUp - numberOfLightUpPixels;
  if(endPixelLitUp < 0) {
    endPixelLitUp = MAX_NUMBER_LED + endPixelLitUp;
