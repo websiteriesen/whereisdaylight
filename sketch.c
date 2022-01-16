@@ -7,12 +7,18 @@
  #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
 #endif
 
+// Digital IO pin connected to the button. This will be driven with a
+// pull-up resistor so the switch pulls the pin to ground momentarily.
+// On a high -> low transition the button press logic will execute.
+#define BUTTON_PIN   2
+
 #define PIXEL_PIN    6  // Digital IO pin connected to the NeoPixels.
 
-#define PIXEL_COUNT 150  // Number of NeoPixels
+int LED_NUMBER_VIENNA = 60;
+int MAX_NUMBER_LED = 120;
 
 // Declare our NeoPixel strip object:
-Adafruit_NeoPixel strip(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip(MAX_NUMBER_LED, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 // Argument 1 = Number of pixels in NeoPixel strip
 // Argument 2 = Arduino pin number (most are valid)
 // Argument 3 = Pixel type flags, add together as needed:
@@ -27,8 +33,7 @@ int     mode     = 0;    // Currently-active animation mode, 0-9
 
 RTC_DS1307 rtc;
 
-int LED_NUMBER_VIENNA = 75;
-int MAX_NUMBER_LED = 150;
+
 
 void setup () {
  while (!Serial); // for Leonardo/Micro/Zero
@@ -45,6 +50,7 @@ void setup () {
    // January 21, 2014 at 3am you would call:
    // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
  }
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
   strip.begin(); // Initialize NeoPixel strip object (REQUIRED)
   strip.show();  // Initialize all pixels to 'off'
 }
@@ -58,7 +64,7 @@ void loop () {
  bool hasRolledOver = false;
  int numberOfLightUpPixels = decimalmap(sunset - sunrise,0,24,0,MAX_NUMBER_LED);
  float currentHour = now.hour();
- float currentTimeInDecimalFormat = currentHour + (now.minute() / (float)60);
+ float currentTimeInDecimalFormat = currentHour + (now.minute() / (float)60) - 1;
  int startPixelLitUp = LED_NUMBER_VIENNA + decimalmap(currentTimeInDecimalFormat - sunrise, 0, 24, 0, MAX_NUMBER_LED);
  int endPixelLitUp = startPixelLitUp - numberOfLightUpPixels;
  if(endPixelLitUp < 0) {
