@@ -6,6 +6,7 @@
 #ifdef __AVR__
  #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
 #endif
+#include <LowPower.h>
 
 // Digital IO pin connected to the button. This will be driven with a
 // pull-up resistor so the switch pulls the pin to ground momentarily.
@@ -14,11 +15,10 @@
 
 #define PIXEL_PIN    6  // Digital IO pin connected to the NeoPixels.
 
-int LED_NUMBER_VIENNA = 60;
-int MAX_NUMBER_LED = 120;
+#define PIXEL_COUNT 150  // Number of NeoPixels
 
 // Declare our NeoPixel strip object:
-Adafruit_NeoPixel strip(MAX_NUMBER_LED, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 // Argument 1 = Number of pixels in NeoPixel strip
 // Argument 2 = Arduino pin number (most are valid)
 // Argument 3 = Pixel type flags, add together as needed:
@@ -31,9 +31,10 @@ Adafruit_NeoPixel strip(MAX_NUMBER_LED, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 boolean oldState = HIGH;
 int     mode     = 0;    // Currently-active animation mode, 0-9
 
-RTC_DS1307 rtc;
+RTC_DS3231 rtc;
 
-
+int LED_NUMBER_VIENNA = 75;
+int MAX_NUMBER_LED = 150;
 
 void setup () {
  while (!Serial); // for Leonardo/Micro/Zero
@@ -42,7 +43,7 @@ void setup () {
    Serial.println("Couldn't find RTC");
    while (1);
  }
- if (! rtc.isrunning()) {
+ if (rtc.lostPower()) {
    Serial.println("RTC is NOT running!");
    // following line sets the RTC to the date & time this sketch was compiled
    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
@@ -62,10 +63,10 @@ void loop () {
  float sunset = getSunsetByDayOfYear(dayOfYear);
  float sunrise = getSunriseByDayOfYear(dayOfYear);
  bool hasRolledOver = false;
- int numberOfLightUpPixels = round(decimalmap(sunset - sunrise,0,24,0,MAX_NUMBER_LED));
+ int numberOfLightUpPixels = decimalmap(sunset - sunrise,0,24,0,MAX_NUMBER_LED);
  float currentHour = now.hour();
- float currentTimeInDecimalFormat = currentHour + (now.minute() / (float)60) - 1;
- int startPixelLitUp = LED_NUMBER_VIENNA + decimalmap(currentTimeInDecimalFormat - sunrise, 0, 24, 0, MAX_NUMBER_LED);
+ float currentTimeInDecimalFormat = currentHour + (now.minute() / (float)60);
+ int startPixelLitUp = LED_NUMBER_VIENNA + decimalmap(0 - sunrise, 0, 24, 0, MAX_NUMBER_LED);
  int endPixelLitUp = startPixelLitUp - numberOfLightUpPixels;
  if(endPixelLitUp < 0) {
    endPixelLitUp = MAX_NUMBER_LED + endPixelLitUp;
@@ -115,9 +116,13 @@ void loop () {
 
   }
    strip.show(); // Update strip with new contents
- Serial.println();
- Serial.println();
- delay(3000);
+   Serial.println();
+   for (int i = 0; i < 38; i++) {
+    //sleep for 5 minutes
+     LowPower.idle(SLEEP_8S, ADC_OFF, TIMER2_OFF, TIMER1_OFF, TIMER0_OFF, 
+                  SPI_OFF, USART0_OFF, TWI_OFF);
+   }
+
 }
 
 int divideAndRoundUp(float x, float y)
