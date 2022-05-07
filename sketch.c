@@ -1,5 +1,3 @@
-#include <SPI.h>
-
 // Date and time functions using a DS1307 RTC connected via I2C and Wire lib
 #include <Wire.h>
 #include "RTClib.h"
@@ -56,7 +54,7 @@ void setup () {
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   strip.begin(); // Initialize NeoPixel strip object (REQUIRED)
   strip.show();  // Initialize all pixels to 'off'
-  strip.setBrightness(10);
+  strip.setBrightness(50);
 }
 void loop () {
   strip.clear();
@@ -135,7 +133,7 @@ void loop () {
  Serial.println();
  Serial.println();
  //delay(3000);
-   for (int i = 0; i < 1; i++) {
+   for (int i = 0; i < 38; i++) {
     //sleep for 5 minutes
      LowPower.idle(SLEEP_8S, ADC_OFF, TIMER2_OFF, TIMER1_OFF, TIMER0_OFF, 
                   SPI_OFF, USART0_OFF, TWI_OFF);
