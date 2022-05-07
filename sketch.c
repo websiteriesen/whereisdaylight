@@ -1,3 +1,5 @@
+#include <SPI.h>
+
 // Date and time functions using a DS1307 RTC connected via I2C and Wire lib
 #include <Wire.h>
 #include "RTClib.h"
@@ -15,10 +17,10 @@
 
 #define PIXEL_PIN    6  // Digital IO pin connected to the NeoPixels.
 
-#define PIXEL_COUNT 150  // Number of NeoPixels
+int MAX_NUMBER_LED = 364;
 
 // Declare our NeoPixel strip object:
-Adafruit_NeoPixel strip(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip(MAX_NUMBER_LED, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 // Argument 1 = Number of pixels in NeoPixel strip
 // Argument 2 = Arduino pin number (most are valid)
 // Argument 3 = Pixel type flags, add together as needed:
@@ -33,8 +35,8 @@ int     mode     = 0;    // Currently-active animation mode, 0-9
 
 RTC_DS3231 rtc;
 
-int LED_NUMBER_VIENNA = 75;
-int MAX_NUMBER_LED = 150;
+int LED_NUMBER_VIENNA = 157;
+
 
 void setup () {
  while (!Serial); // for Leonardo/Micro/Zero
@@ -54,6 +56,7 @@ void setup () {
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   strip.begin(); // Initialize NeoPixel strip object (REQUIRED)
   strip.show();  // Initialize all pixels to 'off'
+  strip.setBrightness(10);
 }
 void loop () {
   strip.clear();
@@ -63,10 +66,11 @@ void loop () {
  float sunset = getSunsetByDayOfYear(dayOfYear);
  float sunrise = getSunriseByDayOfYear(dayOfYear);
  bool hasRolledOver = false;
- int numberOfLightUpPixels = decimalmap(sunset - sunrise,0,24,0,MAX_NUMBER_LED);
+ int numberOfLightUpPixels = round(decimalmap(sunset - sunrise,0,24,0,MAX_NUMBER_LED));
  float currentHour = now.hour();
- float currentTimeInDecimalFormat = currentHour + (now.minute() / (float)60);
- int startPixelLitUp = LED_NUMBER_VIENNA + decimalmap(0 - sunrise, 0, 24, 0, MAX_NUMBER_LED);
+ //float currentTimeInDecimalFormat = currentHour + (now.minute() / (float)60) - 1;
+ float currentTimeInDecimalFormat = 3.0f;
+ int startPixelLitUp = LED_NUMBER_VIENNA + decimalmap(currentTimeInDecimalFormat - sunrise, 0, 24, 0, MAX_NUMBER_LED);
  int endPixelLitUp = startPixelLitUp - numberOfLightUpPixels;
  if(endPixelLitUp < 0) {
    endPixelLitUp = MAX_NUMBER_LED + endPixelLitUp;
@@ -76,7 +80,6 @@ void loop () {
    startPixelLitUp = startPixelLitUp - MAX_NUMBER_LED;
    hasRolledOver = true;
  }
- strip.setPixelColor(1, 255,255,255); // Set pixel 'c' to value 'color'
  Serial.print("Sunrise is today at: ");
  Serial.println(getSunriseByDayOfYear(dayOfYear), DEC);
  Serial.print("Light up pixels are: ");
@@ -95,7 +98,8 @@ void loop () {
    Serial.print(startPixelLitUp);
    Serial.print(" and ");
    Serial.print(endPixelLitUp);
-   Serial.println("-150");
+   Serial.print("-");
+   Serial.println(MAX_NUMBER_LED);
 
  } else {
    Serial.print(startPixelLitUp);
@@ -106,18 +110,33 @@ void loop () {
   for(int a=0; a<MAX_NUMBER_LED; a++) { 
     if(hasRolledOver) {
       if(a < startPixelLitUp || a > endPixelLitUp) {
-        strip.setPixelColor(a, 255,255,255); // Set pixel 'c' to value 'color'
+        strip.setPixelColor(a, strip.Color(255,255,255)); // Set pixel 'c' to value 'color'
+        Serial.print(a);
+        Serial.println(" is lit up");
+      } else {
+        strip.setPixelColor(a, strip.Color(0,0,0));
+                Serial.print(a);
+        Serial.println(" is NOT lit up");
       }
     } else {
       if(a > endPixelLitUp && a < startPixelLitUp) {
-        strip.setPixelColor(a, 255,255,255); // Set pixel 'c' to value 'color'
+        strip.setPixelColor(a, strip.Color(255,255,255)); // Set pixel 'c' to value 'color'
+                        Serial.print(a);
+        Serial.println(" is lit up");
+      } else {
+        strip.setPixelColor(a, strip.Color(0,0,0));
+                                Serial.print(a);
+        Serial.println(" is NOT lit up");
       }
     }
+    //strip.show();
 
   }
    strip.show(); // Update strip with new contents
-   Serial.println();
-   for (int i = 0; i < 38; i++) {
+ Serial.println();
+ Serial.println();
+ //delay(3000);
+   for (int i = 0; i < 1; i++) {
     //sleep for 5 minutes
      LowPower.idle(SLEEP_8S, ADC_OFF, TIMER2_OFF, TIMER1_OFF, TIMER0_OFF, 
                   SPI_OFF, USART0_OFF, TWI_OFF);
