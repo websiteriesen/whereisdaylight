@@ -68,8 +68,7 @@ void loop () {
  bool hasRolledOver = false;
  int numberOfLightUpPixels = round(decimalmap(sunset - sunrise,0,24,0,MAX_NUMBER_LED));
  float currentHour = now.hour();
- //float currentTimeInDecimalFormat = currentHour + (now.minute() / (float)60) - 1;
- float currentTimeInDecimalFormat = 3.0f;
+ float currentTimeInDecimalFormat = currentHour + (now.minute() / (float)60) - 1;
  int startPixelLitUp = LED_NUMBER_VIENNA + decimalmap(currentTimeInDecimalFormat - sunrise, 0, 24, 0, MAX_NUMBER_LED);
  int endPixelLitUp = startPixelLitUp - numberOfLightUpPixels;
  if(endPixelLitUp < 0) {
